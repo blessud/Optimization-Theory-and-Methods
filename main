@@ -1,0 +1,141 @@
+## This code is for the course "Optimization Theory and Methods" only
+## follow this repositort at: https://github.com/blessud/Optimization-Theory-and-Methods.git
+##follow me at: https://blessud.github.io/
+## contact me through: wd_0824@stu.xjtu.edu.cn
+
+#introducing the linear programming and the pack of mathematical programming
+from pulp import 
+import math 
+
+#start the defination of new function
+#formulation of the initial matrix
+def z(x):
+	temp=[]
+	for i in range(0,x):
+		temp.append([])
+		for i in range(0,x):
+			temp[-1].append(0)
+	return temp
+	
+#solution of the inverse matrix of the given matrix
+def t(A):
+	m=len(A)
+	n=len(A[0])
+	temp=[]
+	for i in range(0,n):
+		t=[]
+		for j in range(0,m):
+			t.append(A[j][i])
+		temp.append(t)
+	return temp 
+
+#solve the Restricted Master Problem
+#pi represents the coefficient of the dual probelm
+#A represents the initial matrix
+#a represents the number of pieces of length cut in given pattern
+#L represents the length of the roll
+#l represents the requirements
+#b represents the reduced cost
+def solve_it(pi,A,l,L,b): 
+	p=LpProblem('problem',LpMinimize)
+	a=[]
+	for i in range(0,len(A)):
+		a.append(LpVariable('a'+str(i),lowBound=0,cat=pulp.LpInteger))
+	s=0
+	for i in range(0,len(A)):
+		s=s+l[i]*a[i]
+	p += s<=L 
+	for j in range(0,len(A[0])):
+		s=0
+		for j in range(0,len(A)):
+			s=s+A[i][j]
+	s=0
+	for i in range(0,len(a)):
+		s=s+a[i]*pi[i]
+	p += 1-s 
+	status=p.solve()
+	#print the solution procedure
+	result=[]
+	for i in a:
+		result.append(i.varValue)
+	return result,value(p.objective)
+
+#solve the dual problem
+def solve_t(A,L):
+	p=LpProblem('problem',LpMaximize)
+	n=len(A[0])
+	m=len(A)
+	x=[]
+	s=0
+	for i in range(0,n):
+		x.append(LpVariable('x'+str(i+1),lowBound=0,cat=LpContinuous))
+		s=s+x[i]
+	p += s 
+		for i in range(0,m):
+		s=0
+		for j in range(0,n):
+			s=s+x[j]*A[i][j]
+		p += s<=1
+	status=p.solve()
+	#print the solution procedure
+	result=[]
+	for i in x:
+		result.append(i.varValue)
+	return result
+
+#solve the primary problem
+def solve_origin(A,L,l,b):
+	p=LpProblem('problem',LpMinimize)
+	m=len(A[0])
+	x=[]
+	for i in range(0,m):
+		x.append(LpVariable('x'+str(i+1),lowBound=0,cat=LpContinuous))
+	for i in range(0,len(A)):
+		s=0
+		for j in range(0,m):
+			s=s+x[j]*A[i][j]
+		p += s>=b[i]
+	s=0
+	for i in x:
+		s=s+i
+	p += s 
+	print('p',p)
+	sta=p.solve()
+	print(LpStatus[sta])
+	result=0
+	for i in x:
+		result=result+math.ceil(i.varValue)
+	return result 
+
+#satrt of the main programming
+#below, assign the specific value of the length of roll
+#assign requirements of the order, and amounts of the order
+#the example here is the complex one, for the simple one, please alter the value
+L=30
+l=[2,3,5,6,9]
+bb=[50,30,20,15,10]
+A=z(len(l))
+pi=[]
+#initial the matrix
+for i in range(0,len(l)):
+	for j in range(0,len(bb)):
+		if i==j:
+			A[i][i]=math.floor(L/l[i])
+#calculate the coefficient of the dual problem
+pi=solve_t(t(A),L)	
+#calculate the updated number
+print('pi',pi)
+#calculate the reduced cost
+a,b=solve_it(pi,A,l,L,bb)
+#when the reduced cost is negative, add the new restriction to the matrix and return
+#otherwise, output the solution (round up)
+while b<0:
+	for i in range(0,len(A)):
+		A[i].append(int(a[i]))
+	print('a,b,A',a,b,A)
+	pi=solve_t(t(A),L)
+	print('pi',pi)
+	a,b=solve_it(pi,A,l,L,bb)
+print('We need at least'+str(round(solve_origin(A,L,l,bb)))
+print('Fell free to contact me if necessary')
+print('Many thanks!')
