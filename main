@@ -105,6 +105,7 @@ def solve_origin(A,L,l,b):
 	print(LpStatus[sta])
 	result=0
 	for i in x:
+		print('result',result)
 		result=result+math.ceil(i.varValue)
 	return result 
 
