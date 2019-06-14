@@ -1,13 +1,13 @@
 ## This code is for the course "Optimization Theory and Methods" only
-## follow this repositort at: https://github.com/blessud/Optimization-Theory-and-Methods.git
-##follow me at: https://blessud.github.io/
+## follow this repository at: https://github.com/blessud/Optimization-Theory-and-Methods.git
+## follow me at: https://blessud.github.io/
 ## contact me through: wd_0824@stu.xjtu.edu.cn
 
-#introducing the linear programming and the pack of mathematical programming
-from pulp import 
-import math 
+#importing the linear programming and mathematical programming pack
+from pulp import *
+import math
 
-#start the defination of new function
+#start the definition of new function
 #formulation of the initial matrix
 def z(x):
 	temp=[]
@@ -30,7 +30,7 @@ def t(A):
 	return temp 
 
 #solve the Restricted Master Problem
-#pi represents the coefficient of the dual probelm
+#pi represents the coefficient of the dual problem
 #A represents the initial matrix
 #a represents the number of pieces of length cut in given pattern
 #L represents the length of the roll
@@ -70,8 +70,9 @@ def solve_t(A,L):
 	for i in range(0,n):
 		x.append(LpVariable('x'+str(i+1),lowBound=0,cat=LpContinuous))
 		s=s+x[i]
-	p += s 
-		for i in range(0,m):
+	p += s
+
+	for i in range(0,m):
 		s=0
 		for j in range(0,n):
 			s=s+x[j]*A[i][j]
@@ -110,7 +111,6 @@ def solve_origin(A,L,l,b):
 #satrt of the main programming
 #below, assign the specific value of the length of roll
 #assign requirements of the order, and amounts of the order
-#the example here is the complex one, for the simple one, please alter the value
 L=30
 l=[2,3,5,6,9]
 bb=[50,30,20,15,10]
@@ -136,6 +136,5 @@ while b<0:
 	pi=solve_t(t(A),L)
 	print('pi',pi)
 	a,b=solve_it(pi,A,l,L,bb)
-print('We need at least'+str(round(solve_origin(A,L,l,bb)))
-print('Fell free to contact me if necessary')
-print('Many thanks!')
+
+print('we need at least'+str(solve_origin(A,L,l,bb)))
